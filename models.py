@@ -18,5 +18,6 @@ class Price(Base):
   updated = Column(DateTime)
   crypt_currency_id = Column(Text, ForeignKey('crypt_currency.id'))
 
-engine = create_engine('sqlite:///./cryptcurrency.db', echo=True)
-Base.metadata.create_all(engine)
+def setup_db():
+  engine = create_engine('sqlite:///./cryptcurrency.db', echo=True)
+  Base.metadata.create_all(engine)

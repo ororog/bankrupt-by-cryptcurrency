@@ -1,20 +1,26 @@
-from models import CryptCurrency, Price
+from models import CryptCurrency, Price, setup_db
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import requests
 
-engine = create_engine('sqlite:///./cryptcurrency.db', echo=True)
-Session = sessionmaker(bind=engine)
-session = Session()
+def main():
+  setup_db()
 
-response = requests.get('https://api.coinmarketcap.com/v1/ticker/')
+  engine = create_engine('sqlite:///./cryptcurrency.db', echo=True)
+  Session = sessionmaker(bind=engine)
+  session = Session()
 
-for data in response.json():
-  id = data['id']
-  name = data['name']
-  symbol = data['symbol']
-  currency = CryptCurrency(id=id, name=name, symbol=symbol)
-  session.add(currency)
+  response = requests.get('https://api.coinmarketcap.com/v1/ticker/')
 
-session.flush()
-session.commit()
+  for data in response.json():
+    id = data['id']
+    name = data['name']
+    symbol = data['symbol']
+    currency = CryptCurrency(id=id, name=name, symbol=symbol)
+    session.add(currency)
+
+    session.flush()
+    session.commit()
+
+if __name__ == '__main__':
+  main()
