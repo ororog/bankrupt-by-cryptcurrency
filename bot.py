@@ -47,10 +47,10 @@ def main():
 def notify(currency, percentage, from_date):
   image_path = get_random_image()
   output = textwrap.dedent('''
-    {currency} で有り金全部溶かした人の顔です。
+    {currency.name} で有り金全部溶かした人の顔です。
     {image}
-    {currency} が{from_date}から {percentage}% 下落しました。
-  ''').format(currency=currency.name,
+    {currency}(https://coinmarketcap.com/currencies/{currency.id}) が{from_date}から {percentage}% 下落しました。
+  ''').format(currency=currency,
              image=image_path,
              from_date=from_date.strftime('%m月%d日%H時%M分'),
              percentage=percentage).strip()
