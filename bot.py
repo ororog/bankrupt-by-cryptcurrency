@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 import os
 import random
 import datetime
+import textwrap
 
 NOTIFY_SPAN = 1
 NOTIFY_PERCENTAGE = 1
@@ -45,14 +46,14 @@ def main():
 # TODO
 def notify(currency, percentage, from_date):
   image_path = get_random_image()
-  output = '''
+  output = textwrap.dedent('''
     {currency} で有り金全部溶かした人の顔です。
     {image}
     {currency} が{from_date}から {percentage}% 下落しました。
-  '''.format(currency=currency.name,
+  ''').format(currency=currency.name,
              image=image_path,
              from_date=from_date.strftime('%m月%d日%H時%M分'),
-             percentage=percentage)
+             percentage=percentage).strip()
   print(output)
 
 def get_random_image():
