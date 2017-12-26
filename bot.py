@@ -53,7 +53,7 @@ def notify(currency, percentage, from_date):
   ''').format(currency=currency,
              image=image_path,
              from_date=from_date.strftime('%m月%d日%H時%M分'),
-             percentage=percentage).strip()
+             percentage=round(percentage, 2)).strip()
   print(output)
 
 def get_random_image():
