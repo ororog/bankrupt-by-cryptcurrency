@@ -20,7 +20,6 @@ def main():
 
   for currency in currencies:
     from_date_for_currncy = from_date
-    notify(currency, 10, from_date)
     if (currency.last_notified_at is not None and
         currency.last_notified_at.timestamp() > from_date.timestamp()):
       from_date_for_currncy = currency.last_notified_at
