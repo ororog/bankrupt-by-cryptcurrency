@@ -49,7 +49,7 @@ def notify(currency, percentage, from_date):
   output = textwrap.dedent('''
     {currency.name} で有り金全部溶かした人の顔です。
     {image}
-    {currency}(https://coinmarketcap.com/currencies/{currency.id}) が{from_date}から {percentage}% 下落しました。
+    {currency.name}(https://coinmarketcap.com/currencies/{currency.id}) が{from_date}から {percentage}% 下落しました。
   ''').format(currency=currency,
              image=image_path,
              from_date=from_date.strftime('%m月%d日%H時%M分'),
