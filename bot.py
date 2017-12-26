@@ -36,8 +36,7 @@ def main():
         current_price = price.price_usd
 
       percentage = (price.price_usd - current_price) / price.price_usd * 100
-      # if percentage > NOTIFY_PERCENTAGE:
-      if True:
+      if percentage > NOTIFY_PERCENTAGE:
         currency.last_notified_at = price.updated
         session.commit()
         notify(currency, percentage, price.updated)
