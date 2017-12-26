@@ -1,12 +1,15 @@
 from models import CryptCurrency, Price
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import os
+import random
 import datetime
 
 NOTIFY_SPAN = 1
 NOTIFY_PERCENTAGE = 1
 
 def main():
+  current_dir = os.path.abspath(os.path.dirname(__file__))
   engine = create_engine('sqlite:///./cryptcurrency.db')
   Session = sessionmaker(bind=engine)
   session = Session()
@@ -43,6 +46,14 @@ def main():
 # TODO
 def notify(currency, percentage):
   print(currency.name, percentage)
+
+def get_random_image(directory):
+  image_paths = []
+  for file in os.listdir('{}/images'.format(directory)):
+    image_path = '{}/images/{}'.format(directory, file)
+    if not os.path.isdir(image_path):
+      image_paths.append(image_path)
+  return random.choice(image_paths)
 
 
 if __name__ == '__main__':
