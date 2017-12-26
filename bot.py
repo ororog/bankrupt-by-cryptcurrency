@@ -9,7 +9,6 @@ NOTIFY_SPAN = 1
 NOTIFY_PERCENTAGE = 1
 
 def main():
-  current_dir = os.path.abspath(os.path.dirname(__file__))
   engine = create_engine('sqlite:///./cryptcurrency.db')
   Session = sessionmaker(bind=engine)
   session = Session()
@@ -21,6 +20,7 @@ def main():
 
   for currency in currencies:
     from_date_for_currncy = from_date
+    notify(currency, 10, from_date)
     if (currency.last_notified_at is not None and
         currency.last_notified_at.timestamp() > from_date.timestamp()):
       from_date_for_currncy = currency.last_notified_at
@@ -37,20 +37,31 @@ def main():
         current_price = price.price_usd
 
       percentage = (price.price_usd - current_price) / price.price_usd * 100
-      if percentage > NOTIFY_PERCENTAGE:
+      # if percentage > NOTIFY_PERCENTAGE:
+      if True:
         currency.last_notified_at = price.updated
         session.commit()
-        notify(currency, percentage)
+        notify(currency, percentage, price.updated)
         break
 
 # TODO
-def notify(currency, percentage):
-  print(currency.name, percentage)
+def notify(currency, percentage, from_date):
+  image_path = get_random_image()
+  output = '''
+    {currency} で有り金全部溶かした人の顔です。
+    {image}
+    {currency} が{from_date}から {percentage}% 下落しました。
+  '''.format(currency=currency.name,
+             image=image_path,
+             from_date=from_date.strftime('%m月%d日%H時%M分'),
+             percentage=percentage)
+  print(output)
 
-def get_random_image(directory):
+def get_random_image():
+  current_dir = os.path.abspath(os.path.dirname(__file__))
   image_paths = []
-  for file in os.listdir('{}/images'.format(directory)):
-    image_path = '{}/images/{}'.format(directory, file)
+  for file in os.listdir('{}/images'.format(current_dir)):
+    image_path = '{}/images/{}'.format(current_dir, file)
     if not os.path.isdir(image_path):
       image_paths.append(image_path)
   return random.choice(image_paths)
