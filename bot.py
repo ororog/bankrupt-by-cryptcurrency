@@ -51,16 +51,17 @@ def main():
       if percentage > NOTIFY_PERCENTAGE:
         currency.last_notified_at = price.updated
         session.commit()
-        notify(currency, percentage, price.updated)
+        notify(currency, price, percentage)
         break
 
-def notify(currency, percentage, from_date):
+def notify(currency, price, percentage):
   image_path = get_random_image()
   output = textwrap.dedent('''
     {currency.name} で有り金全部溶かした人の顔です。
-    {currency.name}(https://coinmarketcap.com/currencies/{currency.id}) が{from_date}から {percentage}% 下落しました。
+    {currency.name}(https://coinmarketcap.com/currencies/{currency.id}) が{from_date}から {percentage}% 下落し、{price_usd}＄になりました。
   ''').format(currency=currency,
-             from_date=from_date.strftime('%m月%d日%H時%M分'),
+             from_date=price.updated.strftime('%m月%d日%H時%M分'),
+             price_usd=round(price.price_usd, 2),
              percentage=round(percentage, 2)).strip()
 
   with open(image_path, "rb") as image_file:
