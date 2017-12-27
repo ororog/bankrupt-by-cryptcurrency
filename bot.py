@@ -61,7 +61,7 @@ def notify(currency, price, percentage):
 
   with open(image_path, "rb") as image_file:
     image_data=image_file.read()
-    image_upload = twitter.Twitter(domain='upload.twitter.com',auth=auth)
+    image_upload = twitter.Twitter(domain='upload.twitter.com',auth=get_twitter_auth())
     image_id = image_upload.media.upload(media=image_data)["media_id_string"]
     get_twitter_client().statuses.update(status=output, media_ids=",".join([image_id]))
 
@@ -85,13 +85,16 @@ def get_usd_jpy():
 
 
 @lru_cache(maxsize=None)
-def get_twitter_client():
-  auth = twitter.OAuth(consumer_key=CONSUMER_KEY,
+def get_twitter_auth():
+  return twitter.OAuth(consumer_key=CONSUMER_KEY,
                        consumer_secret=CONSUMER_SECRET,
                        token=TOKEN,
                        token_secret=TOKEN_SECRET)
 
-  twitter_client = twitter.Twitter(auth=auth)
+
+@lru_cache(maxsize=None)
+def get_twitter_client():
+  twitter_client = twitter.Twitter(auth=get_twitter_auth())
   return twitter_client
 
 if __name__ == '__main__':
