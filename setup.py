@@ -1,4 +1,4 @@
-from models import CryptCurrency, Price, setup_db
+from models import CryptCurrency, Price, get_engine, setup_db
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import requests
@@ -6,8 +6,7 @@ import requests
 def main():
   setup_db()
 
-  engine = create_engine('sqlite:///./cryptcurrency.db', echo=True)
-  Session = sessionmaker(bind=engine)
+  Session = sessionmaker(bind=get_engine())
   session = Session()
 
   response = requests.get('https://api.coinmarketcap.com/v1/ticker/')
@@ -21,6 +20,7 @@ def main():
 
     session.flush()
     session.commit()
+
 
 if __name__ == '__main__':
   main()

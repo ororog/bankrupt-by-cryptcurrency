@@ -1,4 +1,4 @@
-from models import CryptCurrency, Price
+from models import CryptCurrency, Price, get_engine
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from functools import lru_cache
@@ -17,8 +17,7 @@ TOKEN=os.environ['TWITTER_TOKEN']
 TOKEN_SECRET=os.environ['TWITTER_TOKEN_SECRET']
 
 def main():
-  engine = create_engine('sqlite:///./cryptcurrency.db')
-  Session = sessionmaker(bind=engine)
+  Session = sessionmaker(bind=get_engine())
   session = Session()
 
   currencies = session.query(CryptCurrency).all()

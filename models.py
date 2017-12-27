@@ -1,7 +1,10 @@
-from sqlalchemy.ext.declarative import declarative_base
+from functools import lru_cache
 from sqlalchemy import *
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import *
+import os
 
+DB_NAME='cryptcurrency.db'
 Base = declarative_base()
 class CryptCurrency(Base):
   __tablename__ = 'crypt_currency'
@@ -18,6 +21,12 @@ class Price(Base):
   updated = Column(DateTime)
   crypt_currency_id = Column(Text, ForeignKey('crypt_currency.id'))
 
+
+@lru_cache(maxsize=None)
+def get_engine(debug=False):
+  return create_engine('sqlite:///{}/{}'.format(
+    os.path.abspath(os.path.dirname(__file__)), DB_NAME), echo=debug)
+
+
 def setup_db():
-  engine = create_engine('sqlite:///./cryptcurrency.db', echo=True)
-  Base.metadata.create_all(engine)
+  Base.metadata.create_all(get_engine(debug=True))
