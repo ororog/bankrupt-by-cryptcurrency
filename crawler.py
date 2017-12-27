@@ -1,8 +1,8 @@
 from models import CryptCurrency, Price
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import requests
 import datetime
+import requests
 
 def main():
   engine = create_engine('sqlite:///./cryptcurrency.db', echo=True)

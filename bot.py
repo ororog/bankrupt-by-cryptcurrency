@@ -1,9 +1,11 @@
 from models import CryptCurrency, Price
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from functools import lru_cache
+import datetime
 import os
 import random
-import datetime
+import requests
 import textwrap
 import twitter
 
@@ -13,12 +15,6 @@ CONSUMER_KEY=os.environ['TWITTER_CONSUMER_KEY']
 CONSUMER_SECRET=os.environ['TWITTER_CONSUMER_SECRET']
 TOKEN=os.environ['TWITTER_TOKEN']
 TOKEN_SECRET=os.environ['TWITTER_TOKEN_SECRET']
-
-auth = twitter.OAuth(consumer_key=CONSUMER_KEY,
-                     consumer_secret=CONSUMER_SECRET,
-                     token=TOKEN,
-                     token_secret=TOKEN_SECRET)
-twitter_client = twitter.Twitter(auth=auth)
 
 def main():
   engine = create_engine('sqlite:///./cryptcurrency.db')
@@ -58,19 +54,20 @@ def notify(currency, price, percentage):
   image_path = get_random_image()
   output = textwrap.dedent('''
     {currency.name} で有り金全部溶かした人の顔です。
-    {currency.name}(https://coinmarketcap.com/currencies/{currency.id}) が{from_date}から {percentage}% 下落し、{price_usd}＄になりました。
+    {currency.name} (https://coinmarketcap.com/currencies/{currency.id}) が{from_date}から {percentage}% 下落し、{price_jpy} 円になりました。
   ''').format(currency=currency,
              from_date=price.updated.strftime('%m月%d日%H時%M分'),
-             price_usd=round(price.price_usd, 2),
+             price_usd=round(get_usd_jpy() * price.price_usd, 2),
              percentage=round(percentage, 2)).strip()
 
   with open(image_path, "rb") as image_file:
     image_data=image_file.read()
     image_upload = twitter.Twitter(domain='upload.twitter.com',auth=auth)
     image_id = image_upload.media.upload(media=image_data)["media_id_string"]
-    twitter_client.statuses.update(status=output, media_ids=",".join([image_id]))
+    get_twitter_client().statuses.update(status=output, media_ids=",".join([image_id]))
 
   print(output)
+
 
 def get_random_image():
   current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -81,6 +78,22 @@ def get_random_image():
       image_paths.append(image_path)
   return random.choice(image_paths)
 
+
+@lru_cache(maxsize=None)
+def get_usd_jpy():
+  pairs = requests.get('http://www.gaitameonline.com/rateaj/getrate').json()['quotes']
+  return float([pair for pair in pairs if pair['currencyPairCode'] == 'USDJPY'][0]['ask'])
+
+
+@lru_cache(maxsize=None)
+def get_twitter_client():
+  auth = twitter.OAuth(consumer_key=CONSUMER_KEY,
+                       consumer_secret=CONSUMER_SECRET,
+                       token=TOKEN,
+                       token_secret=TOKEN_SECRET)
+
+  twitter_client = twitter.Twitter(auth=auth)
+  return twitter_client
 
 if __name__ == '__main__':
   main()
