@@ -57,7 +57,7 @@ def notify(currency, price, percentage):
     {currency.name} (https://coinmarketcap.com/currencies/{currency.id}) が{from_date}から {percentage}% 下落し、{price_jpy} 円になりました。
   ''').format(currency=currency,
              from_date=price.updated.strftime('%m月%d日%H時%M分'),
-             price_usd=round(get_usd_jpy() * price.price_usd, 2),
+             price_jpy=round(get_usd_jpy() * price.price_usd, 2),
              percentage=round(percentage, 2)).strip()
 
   with open(image_path, "rb") as image_file:
