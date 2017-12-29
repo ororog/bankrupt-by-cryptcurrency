@@ -34,7 +34,7 @@ def main():
     prices = session.query(Price).filter(
       Price.crypt_currency_id==currency.id).filter(
       Price.updated > from_date_for_currncy).order_by(
-      Price.updated.desc()).all()
+        Price.updated.desc()).all()
 
     current_price = None
 
@@ -46,16 +46,16 @@ def main():
       if percentage > NOTIFY_PERCENTAGE:
         currency.last_notified_at = price.updated
         session.commit()
-        notify(currency, price, percentage)
+        notify(currency, price, percentage, from_date_for_currncy)
         break
 
-def notify(currency, price, percentage):
+def notify(currency, price, percentage, from_date):
   image_path = get_random_image()
   output = textwrap.dedent('''
     {currency.name} で有り金全部溶かした人の顔です。
     {currency.name} (https://coinmarketcap.com/currencies/{currency.id}) が{from_date}から {percentage}% 下落し、{price_jpy} 円になりました。
   ''').format(currency=currency,
-             from_date=price.updated.strftime('%m月%d日%H時%M分'),
+             from_date=from_date.strftime('%m月%d日%H時%M分'),
              price_jpy=round(get_usd_jpy() * price.price_usd, 2),
              percentage=round(percentage, 2)).strip()
 
