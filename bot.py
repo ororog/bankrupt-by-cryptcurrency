@@ -23,7 +23,8 @@ def main():
   currencies = session.query(CryptCurrency).all()
 
   JST = datetime.timezone(datetime.timedelta(hours=9), 'JST')
-  from_date = datetime.datetime.now(JST) - datetime.timedelta(hours=NOTIFY_SPAN)
+  now = datetime.datetime.now(JST)
+  from_date = now - datetime.timedelta(hours=NOTIFY_SPAN)
 
   for currency in currencies:
     from_date_for_currncy = from_date
@@ -44,18 +45,18 @@ def main():
 
       percentage = (price.price_usd - current_price) / price.price_usd * 100
       if percentage > NOTIFY_PERCENTAGE:
-        currency.last_notified_at = price.updated
+        currency.last_notified_at = now
         session.commit()
-        notify(currency, price, percentage, from_date_for_currncy)
+        notify(currency, price, percentage)
         break
 
-def notify(currency, price, percentage, from_date):
+def notify(currency, price, percentage):
   image_path = get_random_image()
   output = textwrap.dedent('''
     {currency.name} で有り金全部溶かした人の顔です。
     {currency.name} (https://coinmarketcap.com/currencies/{currency.id}) が{from_date}から {percentage}% 下落し、{price_jpy} 円になりました。
   ''').format(currency=currency,
-             from_date=from_date.strftime('%m月%d日%H時%M分'),
+             from_date=price.updated.strftime('%m月%d日%H時%M分'),
              price_jpy=round(get_usd_jpy() * price.price_usd, 2),
              percentage=round(percentage, 2)).strip()
 
